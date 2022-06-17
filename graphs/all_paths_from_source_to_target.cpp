@@ -11,6 +11,7 @@
 // is no need to record nodes that have been seen. Commenting out mSeen
 // improves runtime from beating 18% to beating 24% of submissions.
 class Solution {
+#ifdef MY_LONG_WINDED_SOLUTION
 private:
     // DAG = directed acyclic graph
     class WalkDag
@@ -124,4 +125,48 @@ public:
 
       return wd.getOutput();
     }
+#else
+// Leetcode tutorial solution: faster than 85% of c++ submissions
+public:
+    // DFS
+    void dfs(vector<vector<int>>& graph,
+             const int node,
+             vector<int>& path,
+             vector<vector<int>>& paths)
+    {
+        path.push_back(node);  // using path like a stack
+        if (node == graph.size() - 1)
+        {
+            // found the target node: add accumulated path to output
+            paths.emplace_back(path);
+            return;
+        }
+
+        vector<int> nextNodes = graph[node];  // equiv to adjacency list for cur node
+
+        // recursively visit nodes in adj list
+        // don't need to worry if the node has been seen
+        for (int nextNode : nextNodes)
+        {
+            dfs(graph, nextNode, path, paths);
+            path.pop_back();  // use 'path' like a stack
+        }
+    }
+
+    vector<vector<int>> allPathsSourceTarget(vector<vector<int>>& graph)
+    {
+        vector<vector<int>> paths;  // output
+
+        if (graph.size() == 0)
+        {
+            return paths;
+        }
+
+        vector<int> path;            // vector can be used like a stack
+
+        dfs(graph, 0, path, paths);  // primed the search with node 0
+
+        return paths;
+    }
+#endif
 };
