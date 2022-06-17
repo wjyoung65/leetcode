@@ -6,6 +6,10 @@
 // But it passed "submission" rather quickly.
 // Just dealt with a number of compile errors and one programming error
 // checking if a number was in the seen set (!~ instead of == set.end())
+//
+// Since the input is guaranteed to be a directed acyclic graphs, there
+// is no need to record nodes that have been seen. Commenting out mSeen
+// improves runtime from beating 18% to beating 24% of submissions.
 class Solution {
 private:
     // DAG = directed acyclic graph
