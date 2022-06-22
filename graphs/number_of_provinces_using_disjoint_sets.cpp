@@ -17,10 +17,10 @@ private:
         , mRanks(sz)
         {
           // initialize the disjoint set so array[n] = n (each node is its own root)
-          int j = 0;
-          for ( auto &i : mRoots )
+          for ( unsigned ctr = 0; ctr < sz; ctr++ )
           {
-            i = j++;
+            mRoots[ctr] = ctr;
+            mRanks[ctr] = 1;
           }
         }
 
