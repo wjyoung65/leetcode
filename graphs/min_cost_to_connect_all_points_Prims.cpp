@@ -1,7 +1,7 @@
 // Implementation of Prim's algorithm using a single edge
 // list rather than an adjaceny matrix as Prof Abdul used.
-// Did that because the input is a set of vertices, and
-// all vertices connect to each other.
+// Did that because the input is a set of vertices forming
+// a complete graph: all vertices connect to each other.
 class Solution {
 //#define DEBUG 1
     class Edge
@@ -152,13 +152,13 @@ public:
       near[0] = near[k] = ALREADY_DONE;
 
       // Set up the near array. Up to this point each element contains
-      // either 0 or infinity. After this each element will contain
-      // 0 or t[0][0] or t[1][0], whichever is closest to i.
-      for ( int i = 0; i < n; i++ )
+      // ALREADY_DONE or infinity. After this each element will contain
+      // ALREADY_DONE or t[0][0] or t[1][0], whichever is closest to v.
+      for ( int v = 0; v < n; v++ )
       {
-        if ( near[i] == ALREADY_DONE )
-          continue;  // i is a vertex already in the 't' array
-        near[i] = (lookup(t[0][0], i) < lookup(t[1][0], i)) ? t[0][0] : t[1][0];
+        if ( near[v] == ALREADY_DONE )
+          continue;  // v is a vertex already in the 't' array
+        near[v] = (lookup(t[0][0], v) < lookup(t[1][0], v)) ? t[0][0] : t[1][0];
       }
 
 #ifdef DEBUG
@@ -168,7 +168,7 @@ public:
         cout << near[i] << " ";
       cout << endl;
 #endif
-      // Find the remaining edges
+      // Find the remaining edges, fill the rest of 't'
       for ( int i = 1; i < n-1; i++ )
       {
         min = MY_INFINITY;
