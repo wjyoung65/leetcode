@@ -1,0 +1,184 @@
+class Solution {
+  //#define DEBUG
+
+#ifdef MY_ATTEMPT  // Time limit exceeded
+  bool isPalindrome( const string & s )
+  {
+    int len = s.length();
+    if ( len == 1 )
+      return true;
+
+    #ifdef DEBUG
+    cout << "isPal " << s << endl;
+    #endif
+
+    for ( int i = 0; i < len/2; i++ )
+    {
+      #ifdef DEBUG
+      cout << "compare " << s[i] << " to " << s[len-1-i] << endl;
+      #endif
+      if ( s[i] != s[len-1-i] )
+        return false;
+    }
+    return true;
+  }
+
+  bool myCompare( const string & s1, const string & s2 )
+  {
+    int len1 = s1.length();
+    int len2 = s2.length();
+    int len = min(len1, len2);
+    int i = 0;
+    int j = len2 - 1;
+
+    // compare s1 to backwards(s2)
+    for ( ; i < len; i++, j-- )
+    {
+      if ( s1[i] != s2[j] )
+        return false;
+    }
+    // take care of remainders
+    if ( len1 < len2 )
+    {
+      // e.g. s1 = "abc"
+      //      s2 = "gfedcba"
+      // Now j = 3.
+      // See if "gfed" is a palindrome
+      #ifdef DEBUG
+      cout << "call isPal with s2 " << s2 << " , 0, len " << j + 1 << endl;
+      #endif
+      return isPalindrome( s2.substr( 0, j + 1 ) );
+    }
+    else if ( len1 > len2 )
+    {
+      // e.g. s1 = "abcdefg"
+      //      s2 = "cba"
+      // Now i = 3.
+      // See if "defg" is a palindrome
+      #ifdef DEBUG
+      cout << "call isPal with s1 " << s1 << " , i " << i << ", len " << len1 - i << endl;
+      #endif
+      return isPalindrome( s1.substr( i, len1 - i ) );
+    }
+    // else len1 == len2
+    // if this line is reached, then s1 == backwards(s2)
+    return true;
+  }
+public:
+    vector<vector<int>> palindromePairs(vector<string>& words) {
+      int sz = words.size();
+      vector< vector<int> > output;
+
+      if ( sz == 1 )
+        return output;
+
+      for ( int i = 0; i < sz; i++ )
+      {
+        for ( int j = i+1; j < sz; j++ )
+        {
+          if ( words[i].length() == words[j].length() )
+          {
+            if ( myCompare(words[i], words[j]) )
+            {
+              #ifdef DEBUG
+              cout << "1: " << words[i] << " " << words[j] << endl;
+              #endif
+              output.push_back({i, j});
+              output.push_back({j, i});
+            }
+          }
+          else
+          {
+            if ( myCompare(words[i], words[j]) )
+            {
+              #ifdef DEBUG
+              cout << "2a: " << words[i] << " " << words[j] << endl;
+              #endif
+              output.push_back({i, j});
+            }
+            if ( myCompare(words[j], words[i]) )
+            {
+              #ifdef DEBUG
+              cout << "2b: " << words[j] << " " << words[i] << endl;
+              #endif
+              output.push_back({j, i});
+            }
+          }
+        }
+      }
+
+      return output;
+    }
+#else
+  // rupakk's solution
+private:
+	bool isPalindrome(string& word, int l, int r) {
+		while (l < r)
+		{
+			if (word[l] != word[r]) return false;
+			l++; r--;
+		}
+		return true;
+	}
+public:
+	vector<vector<int>> palindromePairs(vector<string>& words) {
+		unordered_map<string, int> mp;
+		vector<vector<int>> ans;
+		int emptyInd = -1;
+		vector<int> indexOfPalindromes;
+		for (int i = 0; i < words.size(); ++i)
+		{
+			if (words[i] == "")
+			{
+				emptyInd = i;
+				continue;
+			}
+			if (isPalindrome(words[i], 0, words[i].size() - 1))
+				indexOfPalindromes.push_back(i);
+			string str = words[i];
+			//Inserting reverse so that we dont have to reverse every substring in later part
+			reverse(begin(str), end(str));
+			mp[str] = i;
+		}
+		for (int i = 0; i < words.size(); ++i)
+		{
+			for (int cut = 0; cut < words[i].size(); ++cut)
+			{
+				//Current String gives Left + Mid
+				//We need to check whether Mid is Palindrome or not
+				//If yes, we need to search for Right
+				// Left = {0, cut-1}
+				// Mid = {cut, words[i].size() - 1}
+				if (isPalindrome(words[i], cut, words[i].size() - 1))
+				{
+					string right = words[i].substr(0, cut);
+					if (mp.find(right) != end(mp) && mp[right] != i)
+					{
+						ans.push_back(vector<int> {i, mp[right]});
+					}
+				}
+				//Current String gives Mid + Right
+				//We need to check whether Mid is Palindrome or not
+				//If yes, we need to search for Left
+				// Mid = {0, cut-1}
+				// Right = {cut, words[i].size() - 1}
+				if (isPalindrome(words[i], 0, cut - 1))
+				{
+					string left = words[i].substr(cut);
+					if (mp.find(left) != end(mp) && mp[left] != i)
+					{
+						ans.push_back(vector<int> {mp[left], i});
+					}
+				}
+			}
+		}
+		if (emptyInd != -1)
+			for (int x : indexOfPalindromes)
+			{
+				ans.push_back(vector<int> {emptyInd, x});
+				ans.push_back(vector<int> {x, emptyInd});
+			}
+		return ans;
+	}
+#endif
+};
